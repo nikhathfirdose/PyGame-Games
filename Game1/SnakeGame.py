@@ -1,51 +1,242 @@
 import pygame
 import sys
-from pygame.locals import *
-#  python.linting.mypyArgs
 
-x = 10
-y = 10
-screen = 0
-red = [255, 0, 0]
-white = [255, 255, 255]
+import time
+
+import random
 
 
-def my_quit():
+pygame.init()
+
+
+white = (255, 255, 255)
+
+black = (100, 0, 0)
+
+red = (255, 0, 0)
+
+window_width = 950
+
+window_height = 600
+
+
+gameDisplay = pygame.display.set_mode((window_width, window_height))
+
+pygame.display.set_caption('Slither Snake Game')
+
+
+clock = pygame.time.Clock()
+
+FPS = 5
+
+snakeWidth = 20
+
+noPixel = 0
+
+'''
+
+sizeGrd = window_width // snakeWidth
+
+
+
+row = 0
+
+col = 0
+
+for nextline in range(sizeGrd):
+
+'''
+
+
+def myquit():
+    ''' Self explanatory '''
+
     pygame.quit()
+
     sys.exit(0)
 
 
-def check_inputs(events):
-    global x, y, screen
-    for event in events:
-        if(event.type == QUIT):
-            my_quit()
-        else:
-            if(event.type == KEYDOWN):
-                if(event.key == K_ESCAPE):
-                    my_quit()
-                elif(event.key == K_LEFT):
-                    x -= 5
-                    print("LEFT")
-                elif(event.key == K_RIGHT):
-                    x += 5
-                    print("RIGHT")
-                else:
-                    print(event.key)
-    screen.fill(red)
-    pygame.draw.rect(screen, white, (x, 50, 50, 10))
-    pygame.display.update()
+font = pygame.font.SysFont(None, 25, bold=True)
 
 
-def main():
-    global screen
-    pygame.init()
-    window = pygame.display.set_mode((1000, 600))
-    pygame.display.set_caption("Slither Snake Game")
-    screen = pygame.display.get_surface()
-    pygame.display.update()
-    while True:
-        check_inputs(pygame.event.get())
+def drawGrid():
+
+    sizeGrd = window_width // snakeWidth
 
 
-main()
+def snake(snakeWidth, snakelist):
+
+    #x = 250 - (segment_width + segment_margin) * i
+
+    for size in snakelist:
+
+        pygame.draw.rect(gameDisplay, black, [
+                         size[0]+5, size[1], snakeWidth, snakeWidth], 2)
+
+
+def message_to_screen(msg, color):
+
+    screen_text = font.render(msg, True, color)
+
+    gameDisplay.blit(screen_text, [window_width/3, window_height/2])
+
+
+def gameLoop():
+
+    gameExit = False
+
+    gameOver = False
+
+    lead_x = window_width/2
+
+    lead_y = window_height/2
+
+    change_pixels_of_x = 0
+
+    change_pixels_of_y = 0
+
+    snakelist = []
+
+    snakeLength = 1
+
+    randomAppleX = round(random.randrange(
+        0, window_width-snakeWidth)/10.0)*10.0
+
+    randomAppleY = round(random.randrange(
+        0, window_height-snakeWidth)/10.0)*10.0
+
+    while not gameExit:
+
+        while gameOver == True:
+
+            gameDisplay.fill(white)
+
+            message_to_screen(
+                "Game over, press C to play again or Q to quit", red)
+
+            pygame.display.update()
+
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+
+                    gameOver = False
+
+                    gameExit = True
+
+                if event.type == pygame.KEYDOWN:
+
+                    if event.key == pygame.K_q:
+
+                        gameExit = True
+
+                        gameOver = False
+
+                    if event.key == pygame.K_c:
+
+                        gameLoop()
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+
+                gameExit = True
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_ESCAPE:
+
+                    myquit()
+
+                leftArrow = event.key == pygame.K_LEFT
+
+                rightArrow = event.key == pygame.K_RIGHT
+
+                upArrow = event.key == pygame.K_UP
+
+                downArrow = event.key == pygame.K_DOWN
+
+                if leftArrow:
+
+                    change_pixels_of_x = -snakeWidth
+
+                    change_pixels_of_y = noPixel
+
+                elif rightArrow:
+
+                    change_pixels_of_x = snakeWidth
+
+                    change_pixels_of_y = noPixel
+
+                elif upArrow:
+
+                    change_pixels_of_y = -snakeWidth
+
+                    change_pixels_of_x = noPixel
+
+                elif downArrow:
+
+                    change_pixels_of_y = snakeWidth
+
+                    change_pixels_of_x = noPixel
+
+            if lead_x >= window_width or lead_x < 0 or lead_y >= window_height or lead_y < 0:
+
+                gameOver = True
+
+        lead_x += change_pixels_of_x
+
+        lead_y += change_pixels_of_y
+
+        gameDisplay.fill(white)
+
+        AppleThickness = 20
+
+        print([int(randomAppleX), int(randomAppleY),
+               AppleThickness, AppleThickness])
+
+        pygame.draw.rect(gameDisplay, red, [
+                         randomAppleX, randomAppleY, AppleThickness, AppleThickness])
+
+        allspriteslist = []
+
+        allspriteslist.append(lead_x)
+
+        allspriteslist.append(lead_y)
+
+        snakelist.append(allspriteslist)
+
+        if len(snakelist) > snakeLength:
+
+            del snakelist[0]
+
+        for eachSegment in snakelist[:-1]:
+
+            if eachSegment == allspriteslist:
+
+                gameOver = True
+
+        snake(snakeWidth, snakelist)
+
+        pygame.display.update()
+
+        if lead_x >= randomAppleX and lead_x <= randomAppleX + AppleThickness:
+
+            if lead_y >= randomAppleY and lead_y <= randomAppleY + AppleThickness:
+
+                randomAppleX = round(random.randrange(
+                    0, window_width-snakeWidth)/10.0)*10.0
+
+                randomAppleY = round(random.randrange(
+                    0, window_height-snakeWidth)/10.0)*10.0
+
+                snakeLength += 1
+
+        clock.tick(FPS)
+
+    pygame.quit()
+
+    quit()
+
+
+gameLoop()
