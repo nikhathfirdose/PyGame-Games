@@ -4,8 +4,8 @@ def performOps(A):
     B = []
     for i in range(len(A)):
         B.append([0] * n)
-      #   for j in range(len(A[i])):
-      #       B[i][n - 1 - j] = A[i][j]
+        for j in range(len(A[i])):
+            B[i][n - 1 - j] = A[i][j]
     return B
 
 
