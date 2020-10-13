@@ -10,5 +10,4 @@ def Bub(a):
     return a
 
 
-arr = [1, 2, 3, 5, ]
-print([float(r) for r in arr])
+print(Bub([1, 7, 9]))
